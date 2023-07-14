@@ -13,7 +13,33 @@ module.exports.createTask = async (req, res, next) => {
   }
 };
 
+module.exports.getUserTasks = async (req, res, next) => {
+  try {
+    const match = {};
+    const sort = {};
 
+    if (req.query.isCompleted)
+      match.isCompleted = req.query.isCompleted === "true" ? true : false;
+
+    if (req.query.sortBy) {
+      const queryString = req.query.sortBy.split(":");
+      sort[queryString[0]] = queryString[1].toLowerCase() === "asc" ? 1 : -1;
+    }
+
+    await req.user.populate({
+      path: "tasks",
+      match,
+      options: {
+        sort,
+        limit: parseInt(req.query.limit),
+        skip: parseInt(req.query.skip),
+      },
+    });
+    res.send(req.user.tasks);
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports.updateUserTask = async (req, res, next) => {
   try {

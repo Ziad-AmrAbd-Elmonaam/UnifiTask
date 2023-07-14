@@ -21,7 +21,7 @@ router
     validationMW,
     controller.createTask
   )
- 
+  .get(authMW, controller.getUserTasks);
 
 router
   .route("/api/tasks/:id")
